@@ -97,7 +97,7 @@ class Electrum {
       }
 
       // Ensure the address is in cash address format.
-      const cashAddr = _this.bchjs.Address.toCashAddress(address)
+      const cashAddr = _this.bchjs.Address.ecashtoCashAddress(address)
 
       // Prevent a common user error. Ensure they are using the correct network address.
       const networkIsValid = _this.routeUtils.validateNetwork(cashAddr)
@@ -151,7 +151,7 @@ class Electrum {
         res.status(400)
         return res.json({
           success: false,
-          error: 'addresses needs to be an array. Use GET for single address.'
+          error: 'addresses needs to be an array. Use GET for single address!'
         })
       }
 
@@ -268,7 +268,7 @@ class Electrum {
         })
       }
 
-      const cashAddr = _this.bchjs.Address.toCashAddress(address)
+      const cashAddr = _this.bchjs.Address.ecashtoCashAddress(address)
 
       // Prevent a common user error. Ensure they are using the correct network address.
       const networkIsValid = _this.routeUtils.validateNetwork(cashAddr)
@@ -318,14 +318,16 @@ class Electrum {
   async utxosBulk (req, res, next) {
     try {
       const addresses = req.body.addresses
+	const addrArray = addresses.map((addrs)=> _this.bchjs.Address.ecashtoCashAddress(addrs))
+	console.log('addrArr ',addrArray)
       // const currentPage = req.body.page ? parseInt(req.body.page, 10) : 0
-
-      // Reject if addresses is not an array.
+	
+     // Reject if addresses is not an array.
       if (!Array.isArray(addresses)) {
         res.status(400)
         return res.json({
           success: false,
-          error: 'addresses needs to be an array. Use GET for single address.'
+          error: 'addresses needs to be an array. Use GET for single address'
         })
       }
 
@@ -342,14 +344,17 @@ class Electrum {
         'Executing electrumx.js/utxoBulk with these addresses: ',
         addresses
       )
-
+	
+	
       // Validate each element in the address array.
-      for (let i = 0; i < addresses.length; i++) {
-        const thisAddress = addresses[i]
+      for (let i = 0; i < addrArray.length; i++) {
+        let thisAddress = addrArray[i]
+	//const etoCashAddr = _this.bchjs.Address.ecashtoCashAddress(addresses[i])
+
 
         // Ensure the input is a valid BCH address.
         try {
-          _this.bchjs.Address.toLegacyAddress(thisAddress)
+          _this.bchjs.Address.ecashtoCashAddress(thisAddress)
         } catch (err) {
           res.status(400)
           return res.json({
@@ -360,6 +365,7 @@ class Electrum {
 
         // Prevent a common user error. Ensure they are using the correct network address.
         const networkIsValid = _this.routeUtils.validateNetwork(thisAddress)
+	
         if (!networkIsValid) {
           res.status(400)
           return res.json({
@@ -371,15 +377,16 @@ class Electrum {
 
       const response = await _this.axios.post(
         `${_this.fulcrumApi}electrumx/utxos/`,
-        { addresses }
+        { addrArray }
       )
 
       res.status(200)
       return res.json(response.data)
     } catch (err) {
       wlogger.error('Error in electrumx.js/utxoBulk().', err)
-
+	console.log("error came from")
       return _this.errorHandler(err, res)
+	
     }
   }
 
@@ -799,7 +806,7 @@ class Electrum {
       }
 
       // Ensure the address is in cash address format.
-      const cashAddr = _this.bchjs.Address.toCashAddress(address)
+      const cashAddr = _this.bchjs.Address.ecashtoCashAddress(address)
 
       // Prevent a common user error. Ensure they are using the correct network address.
       const networkIsValid = _this.routeUtils.validateNetwork(cashAddr)
@@ -819,7 +826,7 @@ class Electrum {
 
       // Get data from ElectrumX server.
       const response = await _this.axios.get(
-        `${_this.fulcrumApi}electrumx/transactions/${address}`
+        `${_this.fulcrumApi}electrumx/transactions/${cashAddr}`
       )
       // console.log('response', response, _this.fulcrumApi)
 
@@ -855,7 +862,7 @@ class Electrum {
         res.status(400)
         return res.json({
           success: false,
-          error: 'addresses needs to be an array. Use GET for single address.'
+          error: 'addresses needs to be an array. Use GET for single address!!!'
         })
       }
 
@@ -1028,7 +1035,7 @@ class Electrum {
         res.status(400)
         return res.json({
           success: false,
-          error: 'addresses needs to be an array. Use GET for single address.'
+          error: 'addresses needs to be an array. Use GET for single address!!!!'
         })
       }
 
