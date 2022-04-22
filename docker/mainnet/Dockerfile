@@ -45,7 +45,7 @@ USER safeuser
 
 # Clone the repository
 WORKDIR /home/safeuser
-RUN git clone https://github.com/Permissionless-Software-Foundation/bch-api
+RUN git clone https://github.com/samrock5000/bch-api
 WORKDIR /home/safeuser/bch-api
 RUN git checkout ct-unstable
 RUN npm install --silent
