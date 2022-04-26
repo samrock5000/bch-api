@@ -10,7 +10,7 @@ export NETWORK=mainnet
 #export NETWORK=testnet
 
 # Full node
-export RPC_IP=<ip>:8332
+export RPC_IP=<ip>:8342
 export RPC_BASEURL=http://$RPC_IP/
 export RPC_USERNAME=bitcoin
 export RPC_PASSWORD=password
